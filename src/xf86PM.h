@@ -27,7 +27,7 @@
  * in this Software without prior written authorization from Metro Link.
  *
  */
-/* $XFree86: xc/programs/Xserver/hw/xfree86/input/penmount/xf86PM.h,v 1.1 2000/08/01 18:59:58 dawes Exp $ */
+/* $XFree86$ */
 
 #ifndef	_PENMOUNT_H_
 #define _PENMOUNT_H_
