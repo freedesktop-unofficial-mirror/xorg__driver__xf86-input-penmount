@@ -43,7 +43,7 @@
 
 #include "xf86PM.h"
 
-InputDriverRec PENMOUNT = {
+_X_EXPORT InputDriverRec PENMOUNT = {
         1,
         "penmount",
         NULL,
@@ -128,8 +128,11 @@ PenMountSetupProc(	pointer module,
 	return (pointer) 1;
 }
 
-XF86ModuleData penmountModuleData = { &VersionRec, PenMountSetupProc, NULL };
-
+_X_EXPORT XF86ModuleData penmountModuleData = { 
+    &VersionRec,
+    PenMountSetupProc,
+    NULL
+};
 
 #endif /* XFree86LOADER */
 
