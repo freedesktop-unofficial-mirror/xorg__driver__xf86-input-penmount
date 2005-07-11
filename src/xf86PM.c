@@ -30,6 +30,10 @@
  */
 /* $XFree86: xc/programs/Xserver/hw/xfree86/input/penmount/xf86PM.c,v 1.2 2000/08/11 19:10:46 dawes Exp $ */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #define _PENMOUNT_C_
 
 #include <misc.h>
