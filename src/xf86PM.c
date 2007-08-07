@@ -751,7 +751,7 @@ DMC9000_ReadInput (InputInfoPtr pInfo)
 static int
 ControlProc (InputInfoPtr pInfo, xDeviceCtl * control)
 {
-	xDeviceTSCalibrationCtl *c = (xDeviceTSCalibrationCtl *) control;
+	xDeviceAbsCalibCtl *c = (xDeviceAbsCalibCtl *) control;
 	PenMountPrivatePtr priv = (PenMountPrivatePtr) (pInfo->private);
 
         priv->min_x = c->min_x;
