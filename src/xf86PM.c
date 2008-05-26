@@ -105,7 +105,9 @@ static const char *reqSymbols[] = {
 	"xf86CollectInputOptions",
 	"xf86ErrorFVerb",
 	"xf86FindOptionValue",
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 3
 	"xf86GetMotionEvents",
+#endif
 	"xf86GetVerbosity",
 	"xf86MotionHistoryAllocate",
 	"xf86NameCmp",
@@ -195,7 +197,10 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	 * Device reports motions on 2 axes in absolute coordinates.
 	 * Axes min and max values are reported in raw coordinates.
 	 */
-	if (InitValuatorClassDeviceStruct (dev, 2, xf86GetMotionEvents,
+	if (InitValuatorClassDeviceStruct (dev, 2,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 3
+					   xf86GetMotionEvents,
+#endif
 					   pInfo->history_size, Absolute) == FALSE)
 		{
 			ErrorF ("Unable to allocate PenMount ValuatorClassDeviceStruct\n");
