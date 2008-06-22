@@ -685,15 +685,15 @@ DMC9000_ReadInput (InputInfoPtr pInfo)
 		}
 		x = ((((unsigned int) (priv->packet[1]&0x07)) << 7)  | (priv->packet[2]&0x7F));
 		y = ((((unsigned int) (priv->packet[3]&0x07)) << 7)  | (priv->packet[4]&0x7F));
-		if (priv->invert_y) 
-		{
-			y = priv->max_y - y;
-		}
 		if ( priv->swap_xy)
 		{
 			tmp = y;
 			y = x;
-			x = tmp;	
+			x = tmp;
+		}
+		if (priv->invert_y)
+		{
+			y = priv->max_y - y;
 		}
 		priv->packet[0] = priv->pen_down ? 0x01 : 0x00;
 
