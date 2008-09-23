@@ -389,7 +389,7 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 	priv->screen_num = xf86SetIntOption( pInfo->options, "ScreenNumber", 0 );
 	priv->button_number = xf86SetIntOption( pInfo->options, "ButtonNumber", 1 );
 	priv->swap_xy = xf86SetIntOption( pInfo->options, "SwapXY", 0 );
-	priv->invert_y = xf86SetIntOption( pInfo->options, "InvertY", 1 );
+	priv->invert_y = xf86SetIntOption( pInfo->options, "InvertY", 0 );
 	priv->buffer = NULL;
 	s = xf86FindOptionValue (pInfo->options, "ReportingMode");
 	if ((s) && (xf86NameCmp (s, "raw") == 0))
