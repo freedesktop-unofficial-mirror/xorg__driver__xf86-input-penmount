@@ -177,6 +177,7 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 {
 	unsigned char map[] =
 	{0, 1};
+	int min_x, min_y, max_x, max_y;
 	/*
 	 * these have to be here instead of in the SetupProc, because when the
 	 * SetupProc is run at server startup, screenInfo is not setup yet
@@ -208,11 +209,33 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 		}
 	else
 		{
-			InitValuatorAxisStruct (dev, 0, priv->min_x, priv->max_x,
+			/* max_* min_* refer to the max/min values we will emit to the core.
+			 * When reporting mode is TS_Raw since we do no scaling, it will
+			 * just be the values in xorg.conf. If however reporting mode is
+			 * TS_Scaled however, xf86ScaleAxis will return a value between 0
+			 * screen_width/screen_height, so we must setup the axis accordingly
+			 * or there will be strange behaviour
+			 */
+			if ( priv->reporting_mode == TS_Raw )
+				{
+					max_x = priv->max_x;
+					min_x = priv->min_x;
+					max_y = priv->max_y;
+					min_y = priv->min_y;
+				}
+			else
+				{
+					max_x = priv->screen_width;
+					min_x = 0;
+					max_y = priv->screen_height;
+					min_y = 0;
+				}
+
+			InitValuatorAxisStruct (dev, 0, min_x, max_x,
 						9500,
 						0 /* min_res */ ,
 						9500 /* max_res */ );
-			InitValuatorAxisStruct (dev, 1, priv->min_y, priv->max_y,
+			InitValuatorAxisStruct (dev, 1, min_y, max_y,
 						10500,
 						0 /* min_res */ ,
 						10500 /* max_res */ );
