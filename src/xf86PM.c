@@ -716,7 +716,7 @@ DMC9000_ReadInput (InputInfoPtr pInfo)
 		}
 		if (priv->invert_y)
 		{
-			y = priv->max_y - y;
+			y = priv->max_y - y + priv->min_y;
 		}
 		priv->packet[0] = priv->pen_down ? 0x01 : 0x00;
 
