@@ -529,6 +529,7 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 	priv->button_number = xf86SetIntOption( pInfo->options, "ButtonNumber", 1 );
 	priv->swap_xy = xf86SetIntOption( pInfo->options, "SwapXY", 0 );
 	priv->invert_y = xf86SetIntOption( pInfo->options, "InvertY", 0 );
+	priv->invert_x = xf86SetIntOption( pInfo->options, "InvertX", 0 );
 	priv->buffer = NULL;
 	s = xf86FindOptionValue (pInfo->options, "ReportingMode");
 	if ((s) && (xf86NameCmp (s, "raw") == 0))
@@ -847,6 +848,10 @@ DMC9000_ReadInput (InputInfoPtr pInfo)
 		if (priv->invert_y)
 		{
 			y = priv->max_y - y + priv->min_y;
+		}
+		if (priv->invert_x)
+		{
+			x = priv->max_x - x + priv->min_x;
 		}
 		priv->packet[0] = priv->pen_down ? 0x01 : 0x00;
 
