@@ -4,6 +4,9 @@
  * CoAuthor: Mayk Langer <langer@vsys.de>
  * 
  * History:
+ * 02/01/2009: mjs <mjs@core7.eu>
+ * - Added DMC9512 controller protocol support
+ *   based on old code from http://www.salt.com.tw/Download/Driver/PenMount/DMC9512/
  * 09/16/2005: Jaya Kumar <jayakumar.xorg@gmail.com> 
  * - Added DMC9000 controller protocol support
  * - DMC9000 support work was sponsored by CIS(M) Sdn Bhd
@@ -348,6 +351,119 @@ DMC9000_DeviceControl (DeviceIntPtr dev, int mode)
 
 }
 
+static Bool
+DMC9512_ProcessDeviceOn(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
+{
+	unsigned char	buf[5] = { 'D', 'G', 0x02, 0x80, 0x00 };
+
+	XisbBlockDuration (priv->buffer, 500000);
+
+	if ( PenMountSendPacket(priv, buf, 5) != Success )
+	{
+		return !Success;
+	}
+
+	/* wait for right response */
+	priv->lex_mode = PenMount_Response0;
+
+	if (PenMountGetPacket (priv) != Success )
+	{
+		return !Success;
+	}
+
+	if ( ! (priv->packet[0] == 0xff && priv->packet[1] == 0x70) )
+	{
+		return !Success;
+	}
+
+	xf86Msg(X_NOTICE, "%s: DMC9512: found\n", pInfo->name);
+	priv->chip = DMC9512;
+
+	/* disable DMC9512 */
+	buf[2] = 0x0a;
+	buf[3] = 0x00;
+	buf[4] = 0x00;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* set screen width */
+	buf[2] = 0x02;
+	buf[3] = 0x03; /*(priv->screen_width & 0x0fff) >> 8;*/
+	buf[4] = 0xfc; /*priv->screen_width & 0xff;*/
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* set screen height */
+	buf[2] = 0x02;
+	buf[3] = 0x13; /*(priv->screen_height & 0x0fff) >> 8;*/
+	buf[4] = 0xfc; /*priv->screen_height & 0xff;*/
+	buf[3] |= 0x10;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* Set Calibration Data */
+	/* Set X-coordinate of the Left Top corner */
+	buf[2] = 0x02;
+	buf[3] = 0x40;
+	buf[4] = 0x03;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* Set Y-coordinate of the Left Top corner */
+	buf[2] = 0x02;
+	buf[3] = 0x50;
+	buf[4] = 0x03;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* Set X-coordinate of the Right bottom corner */
+	buf[2] = 0x02;
+	buf[3] = 0x60;
+	buf[4] = 0xfc;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* Set Y-coordinate of the Right bottom corner */
+	buf[2] = 0x02;
+	buf[3] = 0x70;
+	buf[4] = 0xfc;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* Set Screen Width Again */
+	buf[2] = 0x02;
+	buf[3] = 0x03;
+	buf[4] = 0xfc;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* Set Screen Height Again */
+	buf[2] = 0x02;
+	buf[3] = 0x13;
+	buf[4] = 0xfc;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	/* enable DMC9512 */
+	buf[2] = 0x0a;
+	buf[3] = 0x01;
+	buf[4] = 0x00;
+	PenMountSendPacket(priv,buf,5);
+	priv->lex_mode = PenMount_Response0;
+	PenMountGetPacket(priv);
+
+	return Success;
+}
+
 static InputInfoPtr
 PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 {              
@@ -425,6 +541,8 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 		priv->chip = DMC9000;
 		pInfo->device_control = DMC9000_DeviceControl;
 		pInfo->read_input = DMC9000_ReadInput;
+	} else if ((s) && (xf86NameCmp (s, "DMC9512") == 0)) {
+		priv->chip = DMC9512;
 	}
 
 	priv->proximity = FALSE;
@@ -486,6 +604,18 @@ DeviceControl (DeviceIntPtr dev, int mode)
 				return (!Success);
 			}
 /*			if (isatty (pInfo->fd))		check if DMC8910 is found */
+
+			if (priv->chip == DMC9512)
+			{
+				if (DMC9512_ProcessDeviceOn(priv,dev,pInfo) != Success)
+				{
+					xf86Msg(X_WARNING, "%s: DMC9512: could not initialize", pInfo->name);
+					return !Success;
+				}
+				// else continue to the code below which does common stuff
+				// between 8910/9512 again
+			}
+			else
 			{
 /* echo Success Code */
 				unsigned char	buf[5] = { 'D', 'G', 0x02, 0x80, 0x00 };
@@ -573,7 +703,7 @@ ReadInput (InputInfoPtr pInfo)
 	XisbBlockDuration (priv->buffer, -1);
 	while (1)
 	{
-		if ( priv->chip != DMC8910 )
+		if ( priv->chip != DMC8910 && priv->chip != DMC9512 )
 		{
 			if ( PenMountGetPacket (priv) != Success)
 				break;
@@ -898,7 +1028,7 @@ PenMountGetPacket (PenMountPrivatePtr priv)
 		switch (priv->lex_mode)
 		{
 		case PenMount_byte0:
-			if ( priv->chip != DMC8910 )
+			if ( priv->chip != DMC8910 && priv->chip != DMC9512 )
 			{
 				if (!(c & 0x08) )
 					return (!Success);
@@ -920,7 +1050,7 @@ PenMountGetPacket (PenMountPrivatePtr priv)
 		case PenMount_byte2:
 			priv->packet[2] = (unsigned char) c;
 			priv->lex_mode = PenMount_byte0;
-			if ( priv->chip != DMC8910 )
+			if ( priv->chip != DMC8910 && priv->chip != DMC9512 )
 				return (Success);
 			if (( priv->packet[2] == 0xfe ) && ( priv->packet[1] == 0xfe ))
 				return (Success);
