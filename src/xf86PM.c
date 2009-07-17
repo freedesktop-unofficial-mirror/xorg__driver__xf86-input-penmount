@@ -181,6 +181,9 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	unsigned char map[] =
 	{0, 1};
 	int min_x, min_y, max_x, max_y;
+	Atom axis_labels[2] = { 0, 0 };
+	Atom btn_label = 0;
+
 	/*
 	 * these have to be here instead of in the SetupProc, because when the
 	 * SetupProc is run at server startup, screenInfo is not setup yet
@@ -191,7 +194,11 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	/*
 	 * Device reports button press for 1 button.
 	 */
-	if (InitButtonClassDeviceStruct (dev, 1, map) == FALSE)
+	if (InitButtonClassDeviceStruct (dev, 1,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+                    &btn_label,
+#endif
+                    map) == FALSE)
 		{
 			ErrorF ("Unable to allocate PenMount ButtonClassDeviceStruct\n");
 			return !Success;
@@ -202,6 +209,9 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	 * Axes min and max values are reported in raw coordinates.
 	 */
 	if (InitValuatorClassDeviceStruct (dev, 2,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+					   axis_labels,
+#endif
 #if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 3
 					   xf86GetMotionEvents,
 #endif
@@ -234,11 +244,19 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 					min_y = 0;
 				}
 
-			InitValuatorAxisStruct (dev, 0, min_x, max_x,
+			InitValuatorAxisStruct (dev, 0,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+						axis_labels[0],
+#endif
+						min_x, max_x,
 						9500,
 						0 /* min_res */ ,
 						9500 /* max_res */ );
-			InitValuatorAxisStruct (dev, 1, min_y, max_y,
+			InitValuatorAxisStruct (dev, 1,
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
+						axis_labels[1],
+#endif
+						min_y, max_y,
 						10500,
 						0 /* min_res */ ,
 						10500 /* max_res */ );
