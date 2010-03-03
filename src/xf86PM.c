@@ -84,62 +84,12 @@ static XF86ModuleVersionInfo VersionRec =
 								 * a tool */
 };
 
-
-static const char *reqSymbols[] = {
-	"AddEnabledDevice",
-	"ErrorF",
-	"InitButtonClassDeviceStruct",
-	"InitProximityClassDeviceStruct",
-	"InitValuatorAxisStruct",
-	"InitValuatorClassDeviceStruct",
-	"InitPtrFeedbackClassDeviceStruct",
-	"RemoveEnabledDevice",
-	"Xcalloc",
-	"Xfree",
-	"XisbBlockDuration",
-	"XisbFree",
-	"XisbNew",
-	"XisbRead",
-	"XisbTrace",
-	"screenInfo",
-	"xf86AddInputDriver",
-	"xf86AllocateInput",
-	"xf86CloseSerial",
-	"xf86CollectInputOptions",
-	"xf86ErrorFVerb",
-	"xf86FindOptionValue",
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 3
-	"xf86GetMotionEvents",
-#endif
-	"xf86GetVerbosity",
-	"xf86MotionHistoryAllocate",
-	"xf86NameCmp",
-	"xf86OpenSerial",
-	"xf86OptionListCreate",
-	"xf86OptionListMerge",
-	"xf86OptionListReport",
-	"xf86PostButtonEvent",
-	"xf86PostMotionEvent",
-	"xf86PostProximityEvent",
-	"xf86ProcessCommonOptions",
-	"xf86ScaleAxis",
-	"xf86SetIntOption",
-	"xf86SetStrOption",
-	"xf86XInputSetScreen",
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) == 0
-	"xf86XInputSetSendCoreEvents",
-#endif
-	NULL
-};
-
-
 static pointer
 PenMountSetupProc(	pointer module,
 			pointer options,
 			int *errmaj,
 			int *errmin )
 {
-	xf86LoaderReqSymLists(reqSymbols, NULL);
 	xf86AddInputDriver(&PENMOUNT, module, 0);
 	return (pointer) 1;
 }
