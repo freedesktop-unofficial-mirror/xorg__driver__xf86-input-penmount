@@ -20,37 +20,42 @@
 #
 # Process this file with autoconf to produce a configure script
 
-AC_PREREQ(2.57)
+# Initialize Autoconf
+AC_PREREQ(2.60)
 AC_INIT([xf86-input-penmount],
-        1.4.1,
+        [1.4.1],
         [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],
-        xf86-input-penmount)
-
-# Require xorg-macros version >= 1.3.0 for XORG_DEFAULT_OPTIONS
-m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.3 or later before running autoconf/autogen])])
-XORG_MACROS_VERSION(1.3)
-
+        [xf86-input-penmount])
 AC_CONFIG_SRCDIR([Makefile.am])
-AC_CONFIG_AUX_DIR(.)
-AM_INIT_AUTOMAKE([dist-bzip2])
+AC_CONFIG_HEADERS([config.h])
+AC_CANONICAL_HOST
 
+# Initialize Automake
+AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-DRIVER_NAME=penmount
-AC_SUBST([DRIVER_NAME])
-
-AM_CONFIG_HEADER([config.h])
-
-# Checks for programs.
-AC_DISABLE_STATIC
+# Initialize libtool
 AC_PROG_LIBTOOL
-AC_PROG_CC
-XORG_DEFAULT_OPTIONS
+AC_DISABLE_STATIC
 
+# Initialize Autoheader
 AH_TOP([#include "xorg-server.h"])
 
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_CC_C99
+AC_PROG_CXX
+AC_PROG_INSTALL
+
+# Initialize X.Org macros
+m4_ifndef([XORG_MACROS_VERSION],
+          [m4_fatal([must install xorg-macros 1.4 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.4)
+XORG_DEFAULT_OPTIONS
+
+# Define a configure option for an alternate input module directory
 AC_ARG_WITH(xorg-module-dir,
-            AC_HELP_STRING([--with-xorg-module-dir=DIR],
+            AS_HELP_STRING([--with-xorg-module-dir=DIR],
                            [Default xorg module directory [[default=$libdir/xorg/modules]]]),
             [moduledir="$withval"],
             [moduledir="$libdir/xorg/modules"])
@@ -65,9 +70,11 @@ XORG_DRIVER_CHECK_EXT(XINPUT, inputproto)
 PKG_CHECK_MODULES(XORG, [xorg-server >= 1.0.99.901] xproto $REQUIRED_MODULES)
 sdkdir=$(pkg-config --variable=sdkdir xorg-server)
 
-# Checks for libraries.
+# Define an Automake variable for the driver name
+DRIVER_NAME=penmount
+AC_SUBST([DRIVER_NAME])
 
-# Checks for header files.
-AC_HEADER_STDC
-
-AC_OUTPUT([Makefile src/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile
+                 man/Makefile
+                 src/Makefile])
+AC_OUTPUT
