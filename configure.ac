@@ -28,7 +28,6 @@ AC_INIT([xf86-input-penmount],
         [xf86-input-penmount])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS([config.h])
-AC_CANONICAL_HOST
 
 # Initialize Automake
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
@@ -43,8 +42,6 @@ AH_TOP([#include "xorg-server.h"])
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_CC_C99
-AC_PROG_CXX
 AC_PROG_INSTALL
 
 # Initialize X.Org macros
@@ -68,7 +65,6 @@ XORG_DRIVER_CHECK_EXT(XINPUT, inputproto)
 
 # Checks for pkg-config packages
 PKG_CHECK_MODULES(XORG, [xorg-server >= 1.0.99.901] xproto $REQUIRED_MODULES)
-sdkdir=$(pkg-config --variable=sdkdir xorg-server)
 
 # Define an Automake variable for the driver name
 DRIVER_NAME=penmount
