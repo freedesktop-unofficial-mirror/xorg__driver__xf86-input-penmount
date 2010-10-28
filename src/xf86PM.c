@@ -62,7 +62,6 @@ _X_EXPORT InputDriverRec PENMOUNT = {
         PenMountPreInit,
         /*PenMountUnInit*/NULL,
         NULL,
-        0
 };        
 
 
