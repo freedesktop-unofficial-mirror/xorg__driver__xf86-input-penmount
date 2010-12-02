@@ -413,14 +413,14 @@ static InputInfoPtr
 PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 {              
 	InputInfoPtr pInfo;
-   	PenMountPrivatePtr priv = xcalloc (1, sizeof (PenMountPrivateRec));
+	PenMountPrivatePtr priv = calloc (1, sizeof (PenMountPrivateRec));
 	char *s;
 
 	if (!priv)
 		return NULL;
 
 	if (!(pInfo = xf86AllocateInput(drv, 0))) {
-		xfree(priv);
+		free(priv);
 		return NULL;
 	}
   
@@ -512,12 +512,12 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 	if ((pInfo) && (pInfo->fd))
 		xf86CloseSerial (pInfo->fd);
 	if ((pInfo) && (pInfo->name))
-		xfree (pInfo->name);
+		free (pInfo->name);
 
 	if ((priv) && (priv->buffer))
 		XisbFree (priv->buffer);
 	if (priv)
-		xfree (priv);
+		free (priv);
 	return (pInfo);
 }
 
