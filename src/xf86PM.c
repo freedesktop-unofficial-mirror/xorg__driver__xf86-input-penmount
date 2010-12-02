@@ -447,7 +447,6 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 	pInfo->dev = NULL;
 	pInfo->private = priv;
 	pInfo->private_flags = 0;
-	pInfo->flags = XI86_POINTER_CAPABLE | XI86_SEND_DRAG_EVENTS;
 	pInfo->conf_idev = dev;
 
 	xf86CollectInputOptions(pInfo, default_options, NULL);
