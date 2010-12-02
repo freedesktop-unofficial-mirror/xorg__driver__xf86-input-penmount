@@ -63,10 +63,6 @@ _X_EXPORT InputDriverRec PENMOUNT = {
         NULL,
 };        
 
-
-
-#ifdef XFree86LOADER
-
 static XF86ModuleVersionInfo VersionRec =
 {
 	"penmount",
@@ -97,9 +93,6 @@ _X_EXPORT XF86ModuleData penmountModuleData = {
     PenMountSetupProc,
     NULL
 };
-
-#endif /* XFree86LOADER */
-
 
 /* 
  * Be sure to set vmin appropriately for your device's protocol. You want to
