@@ -57,6 +57,23 @@
 #define TS_Raw 60
 #define TS_Scaled 61
 
+/*
+ * Be sure to set vmin appropriately for your device's protocol. You want to
+ * read a full packet before returning
+ */
+static const char *default_options[] =
+{
+	/*	"Device", "/dev/ttyS1",*/
+	"BaudRate", "19200",
+	"StopBits", "1",
+	"DataBits", "8",
+	"Parity", "None",
+	"Vmin", "3",
+	"Vtime", "1",
+	"FlowControl", "None",
+	NULL,
+};
+
 _X_EXPORT InputDriverRec PENMOUNT = {
         1,
         "penmount",
@@ -96,24 +113,6 @@ _X_EXPORT XF86ModuleData penmountModuleData = {
     PenMountSetupProc,
     NULL
 };
-
-/* 
- * Be sure to set vmin appropriately for your device's protocol. You want to
- * read a full packet before returning
- */
-static const char *default_options[] =
-{
-	/*	"Device", "/dev/ttyS1",*/
-	"BaudRate", "19200",
-	"StopBits", "1",
-	"DataBits", "8",
-	"Parity", "None",
-	"Vmin", "3",
-	"Vtime", "1",
-	"FlowControl", "None",
-	NULL,
-};
-
 
 /*****************************************************************************
  *	Function Definitions
