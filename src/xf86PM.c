@@ -443,9 +443,7 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 	pInfo->device_control = DeviceControl;
 	pInfo->read_input = ReadInput;
 	pInfo->control_proc = ControlProc;
-	pInfo->close_proc = CloseProc;
 	pInfo->switch_mode = SwitchMode;
-	pInfo->conversion_proc = ConvertProc;
 	pInfo->dev = NULL;
 	pInfo->private = priv;
 	pInfo->private_flags = 0;
@@ -871,15 +869,6 @@ ControlProc (InputInfoPtr pInfo, xDeviceCtl * control)
 }
 
 /* 
- * the CloseProc should not need to be tailored to your device
- */
-static void
-CloseProc (InputInfoPtr pInfo)
-{
-
-}
-
-/* 
  * The SwitchMode function may need to be tailored for your device
  */
 static int
@@ -896,41 +885,6 @@ SwitchMode (ClientPtr client, DeviceIntPtr dev, int mode)
         }
         else
                 return (!Success);   
-}
-
-/* 
- * The ConvertProc function may need to be tailored for your device.
- * This function converts the device's valuator outputs to x and y coordinates
- * to simulate mouse events.
- */
-static Bool
-ConvertProc (InputInfoPtr pInfo,
-			 int first,
-			 int num,
-			 int v0,
-			 int v1,
-			 int v2,
-			 int v3,
-			 int v4,
-			 int v5,
-			 int *x,
-			 int *y)
-{
-	PenMountPrivatePtr priv = (PenMountPrivatePtr) (pInfo->private);
-
-	if (priv->reporting_mode == TS_Raw)
-	{
-                *x = xf86ScaleAxis (v0, 0, priv->screen_width, priv->min_x,
-                                                        priv->max_x);
-                *y = xf86ScaleAxis (v1, 0, priv->screen_height, priv->min_y,
-                                                        priv->max_y);
-        }
-        else
-        {
-                *x = v0;
-                *y = v1;
-	}
-	return (TRUE);
 }
 
 /* 
