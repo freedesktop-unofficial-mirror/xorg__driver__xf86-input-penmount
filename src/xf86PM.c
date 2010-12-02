@@ -148,7 +148,7 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	 * Axes min and max values are reported in raw coordinates.
 	 */
 	if (InitValuatorClassDeviceStruct (dev, 2, axis_labels,
-					   pInfo->history_size, Absolute) == FALSE)
+					   GetMotionHistorySize(), Absolute) == FALSE)
 		{
 			ErrorF ("Unable to allocate PenMount ValuatorClassDeviceStruct\n");
 			return !Success;
