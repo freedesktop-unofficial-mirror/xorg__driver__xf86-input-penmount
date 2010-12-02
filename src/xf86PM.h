@@ -91,8 +91,8 @@ static Bool PenMountGetPacket (PenMountPrivatePtr priv);
 static Bool DMC9000_PenMountGetPacket (PenMountPrivatePtr priv);
 static Bool PenMountSendPacket (PenMountPrivatePtr priv, unsigned char *buf, int len );
 
-static InputInfoPtr
-PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags);
+static int
+PenMountPreInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags);
 
 static void
 PenMountPtrCtrl(DeviceIntPtr device, PtrCtrl *ctrl);

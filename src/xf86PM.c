@@ -57,11 +57,15 @@
 #define TS_Raw 60
 #define TS_Scaled 61
 
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 12
+#error "Need server with input ABI 12"
+#endif
+
 /*
  * Be sure to set vmin appropriately for your device's protocol. You want to
  * read a full packet before returning
  */
-static const char *default_options[] =
+static char *default_options[] =
 {
 	/*	"Device", "/dev/ttyS1",*/
 	"BaudRate", "19200",
@@ -81,7 +85,8 @@ _X_EXPORT InputDriverRec PENMOUNT = {
         PenMountPreInit,
         /*PenMountUnInit*/NULL,
         NULL,
-};        
+        default_options
+};
 
 static XF86ModuleVersionInfo VersionRec =
 {
@@ -183,12 +188,14 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 						min_x, max_x,
 						9500,
 						0 /* min_res */ ,
-						9500 /* max_res */ );
+						9500 /* max_res */,
+                                                Absolute);
 			InitValuatorAxisStruct (dev, 1, axis_labels[1],
 						min_y, max_y,
 						10500,
 						0 /* min_res */ ,
-						10500 /* max_res */ );
+						10500 /* max_res */,
+                                                Absolute);
 		}
 		
 	if (InitProximityClassDeviceStruct (dev) == FALSE)
@@ -411,21 +418,15 @@ DMC9512_ProcessDeviceOn(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr 
 	return Success;
 }
 
-static InputInfoPtr
-PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
-{              
-	InputInfoPtr pInfo;
+static int
+PenMountPreInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags)
+{
 	PenMountPrivatePtr priv = calloc (1, sizeof (PenMountPrivateRec));
 	char *s;
 
 	if (!priv)
-		return NULL;
+		return BadAlloc;
 
-	if (!(pInfo = xf86AllocateInput(drv, 0))) {
-		free(priv);
-		return NULL;
-	}
-  
 	priv->min_x = 0;
 	priv->max_x = 1024;
 	priv->min_y = 768;
@@ -446,12 +447,7 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 	pInfo->read_input = ReadInput;
 	pInfo->control_proc = ControlProc;
 	pInfo->switch_mode = SwitchMode;
-	pInfo->dev = NULL;
 	pInfo->private = priv;
-	pInfo->private_flags = 0;
-	pInfo->conf_idev = dev;
-
-	xf86CollectInputOptions(pInfo, default_options, NULL);
 
 	xf86OptionListReport( pInfo->options );
 
@@ -502,10 +498,8 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 
 	/* this results in an xstrdup that must be freed later */
 	pInfo->name = xf86SetStrOption( pInfo->options, "DeviceName", "PenMount");
-	xf86ProcessCommonOptions(pInfo, pInfo->options);
 
-	pInfo->flags |= XI86_CONFIGURED;
-	return (pInfo);
+	return Success;
 
   SetupProc_fail:
 	if ((pInfo) && (pInfo->fd))
@@ -517,7 +511,7 @@ PenMountPreInit(InputDriverPtr drv, IDevPtr dev, int flags)
 		XisbFree (priv->buffer);
 	if (priv)
 		free (priv);
-	return (pInfo);
+	return BadValue;
 }
 
 static Bool
