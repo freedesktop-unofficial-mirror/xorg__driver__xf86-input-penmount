@@ -526,8 +526,6 @@ DeviceControl (DeviceIntPtr dev, int mode)
 {
 	InputInfoPtr pInfo = dev->public.devicePrivate;
 	PenMountPrivatePtr priv = (PenMountPrivatePtr) (pInfo->private);
-	unsigned char map[] =
-	{0, 1};
 
 	switch (mode)
 	{
