@@ -143,9 +143,7 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	 * Device reports button press for 1 button.
 	 */
 	if (InitButtonClassDeviceStruct (dev, 1,
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
                     &btn_label,
-#endif
                     map) == FALSE)
 		{
 			ErrorF ("Unable to allocate PenMount ButtonClassDeviceStruct\n");
@@ -156,13 +154,7 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 	 * Device reports motions on 2 axes in absolute coordinates.
 	 * Axes min and max values are reported in raw coordinates.
 	 */
-	if (InitValuatorClassDeviceStruct (dev, 2,
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
-					   axis_labels,
-#endif
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 3
-					   xf86GetMotionEvents,
-#endif
+	if (InitValuatorClassDeviceStruct (dev, 2, axis_labels,
 					   pInfo->history_size, Absolute) == FALSE)
 		{
 			ErrorF ("Unable to allocate PenMount ValuatorClassDeviceStruct\n");
@@ -192,18 +184,12 @@ ProcessDeviceInit(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo)
 					min_y = 0;
 				}
 
-			InitValuatorAxisStruct (dev, 0,
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
-						axis_labels[0],
-#endif
+			InitValuatorAxisStruct (dev, 0, axis_labels[0],
 						min_x, max_x,
 						9500,
 						0 /* min_res */ ,
 						9500 /* max_res */ );
-			InitValuatorAxisStruct (dev, 1,
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) >= 7
-						axis_labels[1],
-#endif
+			InitValuatorAxisStruct (dev, 1, axis_labels[1],
 						min_y, max_y,
 						10500,
 						0 /* min_res */ ,
@@ -917,13 +903,6 @@ SwitchMode (ClientPtr client, DeviceIntPtr dev, int mode)
                 priv->reporting_mode = mode;
                 return (Success);
         }
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) == 0
-        else if ((mode == SendCoreEvents) || (mode == DontSendCoreEvents))
-        {
-                xf86XInputSetSendCoreEvents (pInfo, (mode == SendCoreEvents));
-                return (Success);
-        }
-#endif
         else
                 return (!Success);   
 }
