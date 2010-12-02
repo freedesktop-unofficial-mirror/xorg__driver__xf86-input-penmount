@@ -54,6 +54,9 @@
 #include <string.h>
 #include "xf86PM.h"
 
+#define TS_Raw 60
+#define TS_Scaled 61
+
 _X_EXPORT InputDriverRec PENMOUNT = {
         1,
         "penmount",
