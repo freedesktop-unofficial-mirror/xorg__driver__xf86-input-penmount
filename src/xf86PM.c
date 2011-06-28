@@ -57,10 +57,6 @@
 #define TS_Raw 60
 #define TS_Scaled 61
 
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 12
-#error "Need server with input ABI 12"
-#endif
-
 /*
  * Be sure to set vmin appropriately for your device's protocol. You want to
  * read a full packet before returning

@@ -64,7 +64,7 @@ XORG_DRIVER_CHECK_EXT(RANDR, randrproto)
 XORG_DRIVER_CHECK_EXT(XINPUT, inputproto)
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(XORG, [xorg-server >= 1.9.99] xproto $REQUIRED_MODULES)
+PKG_CHECK_MODULES(XORG, [xorg-server >= 1.10] xproto $REQUIRED_MODULES)
 
 # Define an Automake variable for the driver name
 DRIVER_NAME=penmount
