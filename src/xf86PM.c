@@ -492,9 +492,6 @@ PenMountPreInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags)
 		goto SetupProc_fail;
 	}
 
-	/* this results in an xstrdup that must be freed later */
-	pInfo->name = xf86SetStrOption( pInfo->options, "DeviceName", "PenMount");
-
 	return Success;
 
   SetupProc_fail:
