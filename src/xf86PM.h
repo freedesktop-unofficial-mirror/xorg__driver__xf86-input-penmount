@@ -93,6 +93,8 @@ static Bool PenMountSendPacket (PenMountPrivatePtr priv, unsigned char *buf, int
 
 static int
 PenMountPreInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags);
+static void
+PenMountUnInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags);
 
 static void
 PenMountPtrCtrl(DeviceIntPtr device, PtrCtrl *ctrl);

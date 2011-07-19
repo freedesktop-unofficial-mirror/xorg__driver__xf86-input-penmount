@@ -79,7 +79,7 @@ _X_EXPORT InputDriverRec PENMOUNT = {
         "penmount",
         NULL,
         PenMountPreInit,
-        /*PenMountUnInit*/NULL,
+        PenMountUnInit,
         NULL,
         default_options
 };
@@ -275,6 +275,7 @@ ProcessDeviceClose(PenMountPrivatePtr priv, DeviceIntPtr dev, InputInfoPtr pInfo
 					priv->buffer = NULL;
 				}
 			xf86CloseSerial(pInfo->fd);
+			pInfo->fd = -1;
 		}
 	dev->public.on = FALSE;
 	return (Success);
@@ -454,6 +455,8 @@ PenMountPreInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags)
 		goto SetupProc_fail;
 	}
 	xf86CloseSerial(pInfo->fd);
+	pInfo->fd = -1;
+
 	/* 
 	 * Process the options for your device like this
 	 */
@@ -495,16 +498,21 @@ PenMountPreInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags)
 	return Success;
 
   SetupProc_fail:
-	if ((pInfo) && (pInfo->fd))
-		xf86CloseSerial (pInfo->fd);
-	if ((pInfo) && (pInfo->name))
-		free (pInfo->name);
-
-	if ((priv) && (priv->buffer))
-		XisbFree (priv->buffer);
-	if (priv)
-		free (priv);
 	return BadValue;
+}
+
+static void
+PenMountUnInit(InputDriverPtr drv, InputInfoPtr pInfo, int flags)
+{
+	PenMountPrivatePtr priv = (PenMountPrivatePtr) (pInfo->private);
+
+	if (priv)
+	{
+		if (priv->buffer)
+			XisbFree (priv->buffer);
+		free (priv);
+		pInfo->private = NULL;
+	}
 }
 
 static Bool
